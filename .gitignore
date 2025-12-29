@@ -48,7 +48,7 @@ tmp/
 run_output.txt
 
 # Kaggle raw datasets (DO NOT COMMIT)
-# public_kaggle_files/
+public_kaggle_files/
 *.txt
 
 # Generated outputs
