@@ -1,0 +1,127 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Sentiment Classification with Word Embeddings:\\
+A Study on Negation-Aware Representations}
+\author{Chen Zile}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Sentiment classification is a core task in natural language processing, aiming to determine whether a piece of text expresses positive or negative sentiment.
+In this project, we focus on binary sentiment classification of Twitter data using word embeddings and classical machine learning classifiers.
+
+A common approach represents each sentence by aggregating word embeddings (e.g., by averaging) and then applies a linear classifier.
+Although simple and efficient, this approach ignores important linguistic phenomena such as negation.
+For instance, phrases like \textit{``not good''} or \textit{``never liked''} convey negative sentiment despite containing positive words.
+
+In this work, we systematically evaluate several embedding-based classifiers with different aggregation strategies.
+We observe that more advanced weighting schemes and classifiers improve performance over a simple baseline, but the best results are obtained when negation information is explicitly incorporated into the sentence representation.
+
+\section{Dataset and Preprocessing}
+
+We use the Twitter sentiment dataset provided in the course project.
+The dataset consists of short tweets labeled as either positive or negative.
+All tweets are pre-tokenized and lowercased.
+
+The dataset is split into training and validation sets, with approximately 90\% of the data used for training and 10\% for validation.
+A vocabulary is constructed from the training data and stored in a serialized file.
+Words outside the vocabulary are ignored during feature construction.
+
+Word embeddings are trained using a GloVe-style model on the training corpus.
+Unless otherwise specified, we use embeddings of dimension 50.
+The learned embeddings are fixed and shared across all classifiers to ensure a fair comparison.
+
+\section{Methods}
+
+\subsection{Baseline Representation}
+
+In the baseline approach, each tweet is represented by the average of the embeddings of the words it contains.
+Formally, for a tweet with words $\{w_1, \dots, w_n\}$ and embeddings $\{\mathbf{v}_1, \dots, \mathbf{v}_n\}$, the sentence representation is
+
+\[
+\mathbf{s} = \frac{1}{n} \sum_{i=1}^{n} \mathbf{v}_i.
+\]
+
+This representation ignores word order and treats all words equally.
+
+\subsection{Embedding-Based Classifiers}
+
+Using the same sentence representation, we evaluate three classifiers:
+
+\begin{itemize}
+    \item \textbf{Logistic Regression}: A linear classifier trained on averaged embeddings.
+    \item \textbf{TF-IDF Weighted Embeddings}: Word embeddings are weighted by their TF-IDF scores before aggregation.
+    \item \textbf{Linear SVM}: A linear support vector machine trained on averaged embeddings.
+\end{itemize}
+
+These methods differ in how they weight or separate features, but none of them explicitly models negation.
+
+\subsection{Negation-Aware Representation}
+
+Negation plays a crucial role in sentiment analysis, as it can reverse the polarity of sentiment-bearing words.
+To model this phenomenon, we introduce a negation-aware sentence representation.
+
+When a negation word (e.g., \textit{``not''}, \textit{``no''}, \textit{``never''}) is encountered, the embeddings of the following words within a fixed window are modified by reversing their sign.
+If a word $w_i$ falls within the scope of a negation, its embedding $\mathbf{v}_i$ is replaced by $-\mathbf{v}_i$.
+
+The final tweet representation is obtained by averaging these modified embeddings.
+This approach preserves the embedding space while explicitly encoding sentiment reversal.
+
+\section{Experimental Results}
+
+We evaluate all methods using classification accuracy on both the training and validation sets.
+The results with embedding dimension 50 are summarized in Table~\ref{tab:results}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{Train Accuracy} & \textbf{Validation Accuracy} \\
+\midrule
+Baseline (Logistic Regression) & 0.6665 & 0.6672 \\
+TF-IDF Weighted Embeddings & 0.7181 & 0.7225 \\
+Linear SVM & 0.7390 & 0.7406 \\
+Negation-Aware Classifier & \textbf{0.7429} & \textbf{0.7421} \\
+\bottomrule
+\end{tabular}
+\caption{Classification accuracy of different methods (embedding dimension = 50)}
+\label{tab:results}
+\end{table}
+
+The baseline model achieves the lowest performance.
+TF-IDF weighting and SVM classifiers significantly improve accuracy, indicating that better feature weighting and margin-based classification are beneficial.
+The negation-aware representation consistently achieves the best performance on both training and validation sets.
+
+\section{Discussion}
+
+The experimental results suggest that sentence representation plays a more important role than the choice of classifier alone.
+While TF-IDF weighting and SVMs provide notable improvements over simple averaging, explicitly modeling negation yields the highest accuracy.
+
+We further observe that embedding dimensionality has little impact on the baseline mean-pooling method, but substantially affects TF-IDF weighted and negation-aware representations.
+This indicates that simple averaging compresses information aggressively and fails to exploit additional representational capacity offered by higher-dimensional embeddings.
+In contrast, methods that selectively weight or modify embeddings can better utilize the structure of high-dimensional embedding spaces.
+
+Overall, the negation-aware representation offers a strong performance¨Ccomplexity trade-off, achieving the best results with minimal additional modeling assumptions.
+
+\section{Conclusion}
+
+In this project, we studied sentiment classification using word embeddings and classical machine learning models.
+We showed that simple baseline methods based on mean pooling are limited in performance.
+
+By incorporating TF-IDF weighting, stronger classifiers, and explicit negation handling, we achieved progressively better results.
+Among all methods, the negation-aware representation consistently performed best, demonstrating the importance of incorporating linguistic insights into sentence representations.
+
+Future work could explore more precise modeling of negation scope or combine negation handling with contextual or syntactic information.
+
+\end{document}

@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project outputs (can be regenerated)
+output/
+*.npy
+*.pkl
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+run_output.txt
+
+# Kaggle raw datasets (DO NOT COMMIT)
+# public_kaggle_files/
+*.txt
+
+# Generated outputs
+output/
+*.npy
+*.pkl
+*.csv
